@@ -1,0 +1,22 @@
+[
+  {
+    "question": "Which machine learning algorithm achieved the highest classification accuracy?",
+    "relevant_sections": ["V. CONCLUSION"]
+  },
+  {
+    "question": "Which machine learning algorithms were compared in the study?",
+    "relevant_sections": ["V. CONCLUSION"]
+  },
+  {
+    "question": "How does vehicle size affect CO2 emissions?",
+    "relevant_sections": ["IV. EXPERIMENTS"]
+  },
+  {
+    "question": "How do SUVs compare with non-SUV vehicles in terms of CO2 emissions?",
+    "relevant_sections": ["IV. EXPERIMENTS"]
+  },
+  {
+    "question": "What machine learning methods were used to predict engine performance?",
+    "relevant_sections": ["I. INTRODUCTION"]
+  }
+]

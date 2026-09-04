@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+
+# macOS
+.DS_Store
+
+# Local vector database
+data/qdrant/
+
+# Model/cache files
+.cache/
+huggingface/
+# Research papers
+data/*.pdf
+
+# Local vector database
+data/qdrant/
+
+# Python
+__pycache__/
+*.py[cod]
+venv/
+.venv/
+
+# macOS
+.DS_Store
