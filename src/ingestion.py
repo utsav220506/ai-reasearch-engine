@@ -337,6 +337,7 @@ def build_chunks(
 
         chunks.append(
             {
+                "chunk_id": len(chunks),
                 "text": chunk_text,
                 "section": current_section,
                 "subsection": current_subsection,

@@ -50,6 +50,7 @@ def retrieve(
 
         retrieved_chunks.append(
             {
+                "chunk_id": result.id,
                 "score": result.score,
                 "text": payload["text"],
                 "section": payload["section"],
