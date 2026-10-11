@@ -1,4 +1,5 @@
 import json
+from reranker import load_reranker, rerank
 
 from embeddings import load_model
 from retrieval import create_client, retrieve
@@ -124,6 +125,7 @@ def main():
     client = create_client()
 
     bm25 = build_bm25_index(chunks)
+    reranker = load_reranker()
 
     # -------------------------
     # Dense retrieval
@@ -181,6 +183,38 @@ def main():
         )
 
         return fused_results[:5]
+    def hybrid_reranked_search(question):
+        candidate_k = 10
+
+        dense_results = retrieve(
+            client,
+            model,
+            question,
+            top_k=candidate_k,
+        )
+
+        bm25_results = bm25_retrieve(
+            bm25,
+            chunks,
+            question,
+            top_k=candidate_k,
+        )
+
+        fused_results = reciprocal_rank_fusion(
+            [
+                dense_results,
+                bm25_results,
+            ]
+        )
+
+        candidates = fused_results[:candidate_k]
+
+        return rerank(
+            reranker,
+            question,
+            candidates,
+            top_k=5,
+        )
 
     # -------------------------
     # Run evaluations
@@ -203,6 +237,12 @@ def main():
         hybrid_search,
         "HYBRID RRF",
     )
+    reranked_recall, reranked_mrr = evaluate(
+        questions,
+        hybrid_reranked_search,
+        "HYBRID RRF + RERANKER",
+    )
+
 
     # -------------------------
     # Final comparison
@@ -213,29 +253,34 @@ def main():
     print("========================================")
 
     print(
-        f"\n{'Retriever':<15}"
+        f"{'Retriever':<24}"
         f"{'Recall@5':<12}"
         f"{'MRR':<12}"
     )
-
-    print("-" * 39)
+    print("-" * 48)
 
     print(
-        f"{'Dense':<15}"
+        f"{'Dense':<24}"
         f"{dense_recall:<12.4f}"
         f"{dense_mrr:<12.4f}"
     )
 
     print(
-        f"{'BM25':<15}"
+        f"{'BM25':<24}"
         f"{bm25_recall:<12.4f}"
         f"{bm25_mrr:<12.4f}"
     )
 
     print(
-        f"{'Hybrid RRF':<15}"
+        f"{'Hybrid RRF':<24}"
         f"{hybrid_recall:<12.4f}"
         f"{hybrid_mrr:<12.4f}"
+    )
+
+    print(
+        f"{'Hybrid RRF + Reranker':<24}"
+        f"{reranked_recall:<12.4f}"
+        f"{reranked_mrr:<12.4f}"
     )
 
     client.close()
