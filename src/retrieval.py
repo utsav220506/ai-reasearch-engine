@@ -1,22 +1,14 @@
+
 from typing import Any
 
 from qdrant_client import QdrantClient
 
 from embeddings import load_model, embed_text
-from vector_store import (
-    COLLECTION_NAME,
-    DB_PATH,
-)
+from vector_store import COLLECTION_NAME, DB_PATH
 
 
 def create_client() -> QdrantClient:
-    """
-    Connect to the existing local Qdrant database.
-    """
-
-    return QdrantClient(
-        path=DB_PATH
-    )
+    return QdrantClient(path=DB_PATH)
 
 
 def retrieve(
@@ -25,15 +17,7 @@ def retrieve(
     query: str,
     top_k: int = 5,
 ) -> list[dict[str, Any]]:
-    """
-    Retrieve the most semantically relevant chunks
-    for a research question.
-    """
-
-    query_embedding = embed_text(
-        model,
-        query,
-    )
+    query_embedding = embed_text(model, query)
 
     results = client.query_points(
         collection_name=COLLECTION_NAME,
@@ -45,19 +29,26 @@ def retrieve(
     retrieved_chunks = []
 
     for result in results:
+        payload = result.payload or {}
 
-        payload = result.payload
+        paper_id = payload.get("paper_id", "unknown")
+        local_chunk_id = payload.get("chunk_id", result.id)
 
         retrieved_chunks.append(
             {
-                "chunk_id": result.id,
+                "point_id": result.id,
+                "chunk_id": local_chunk_id,
+                "chunk_key": f"{paper_id}:{local_chunk_id}",
+                "paper_id": paper_id,
+                "paper_title": payload.get("paper_title", "Unknown paper"),
+                "source_file": payload.get("source_file"),
                 "score": result.score,
                 "text": payload["text"],
-                "section": payload["section"],
-                "subsection": payload["subsection"],
-                "page_start": payload["page_start"],
-                "page_end": payload["page_end"],
-                "token_count": payload["token_count"],
+                "section": payload.get("section"),
+                "subsection": payload.get("subsection"),
+                "page_start": payload.get("page_start"),
+                "page_end": payload.get("page_end"),
+                "token_count": payload.get("token_count"),
             }
         )
 
@@ -65,76 +56,29 @@ def retrieve(
 
 
 if __name__ == "__main__":
-
     query = (
         "Which machine learning model performed "
         "best for predicting vehicle CO2 emissions?"
     )
 
-    print("\nLoading embedding model...")
-
     model = load_model()
-
-    print("\nConnecting to Qdrant...")
-
     client = create_client()
 
-    print(
-        f"\nQuery:\n{query}\n"
-    )
+    try:
+        results = retrieve(client, model, query, top_k=5)
 
-    results = retrieve(
-        client,
-        model,
-        query,
-        top_k=5,
-    )
-
-    print(
-        f"Retrieved {len(results)} chunks.\n"
-    )
-
-    for i, result in enumerate(
-        results,
-        start=1,
-    ):
-
-        print(
-            f"\n{'=' * 70}"
-        )
-
-        print(
-            f"RESULT {i}"
-        )
-
-        print(
-            f"Similarity score: "
-            f"{result['score']:.4f}"
-        )
-
-        print(
-            f"Section: "
-            f"{result['section']}"
-        )
-
-        print(
-            f"Subsection: "
-            f"{result['subsection']}"
-        )
-
-        print(
-            f"Pages: "
-            f"{result['page_start']} - "
-            f"{result['page_end']}"
-        )
-
-        print(
-            f"Tokens: "
-            f"{result['token_count']}"
-        )
-
-        print(
-            f"\n{result['text']}"
-        )
-
-    client.close()
+        for rank, result in enumerate(results, start=1):
+            print(f"\n{'=' * 60}")
+            print(f"Rank: {rank}")
+            print(f"Paper: {result['paper_title']}")
+            print(f"Paper ID: {result['paper_id']}")
+            print(f"Chunk: {result['chunk_id']}")
+            print(f"Section: {result['section']}")
+            print(
+                f"Pages: {result['page_start']}–"
+                f"{result['page_end']}"
+            )
+            print(f"Score: {result['score']:.4f}")
+            print(result["text"])
+    finally:
+        client.close()

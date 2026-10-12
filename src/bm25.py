@@ -1,30 +1,40 @@
+
 import re
+from pathlib import Path
 from typing import Any
 
 from rank_bm25 import BM25Okapi
 
+from index_corpus import build_paper_chunks
+
 
 def tokenize(text: str) -> list[str]:
-    """
-    Tokenize research text for BM25.
-
-    Lowercasing and preserving technical alphanumeric
-    terms gives BM25 useful lexical signals.
-    """
-
     return re.findall(
         r"\b[a-zA-Z0-9]+(?:[-_][a-zA-Z0-9]+)*\b",
         text.lower(),
     )
 
 
+def load_corpus_chunks() -> list[dict[str, Any]]:
+    papers_dir = Path("data/papers")
+    pdf_files = sorted(papers_dir.glob("*.pdf"))
+
+    if not pdf_files:
+        raise FileNotFoundError(
+            f"No PDFs found in {papers_dir.resolve()}"
+        )
+
+    all_chunks = []
+
+    for pdf_path in pdf_files:
+        all_chunks.extend(build_paper_chunks(pdf_path))
+
+    return all_chunks
+
+
 def build_bm25_index(
     chunks: list[dict[str, Any]],
 ) -> BM25Okapi:
-    """
-    Build a BM25 index over chunk text.
-    """
-
     corpus = [
         tokenize(chunk["text"])
         for chunk in chunks
@@ -39,12 +49,7 @@ def bm25_retrieve(
     query: str,
     top_k: int = 5,
 ) -> list[dict[str, Any]]:
-    """
-    Retrieve chunks using BM25 lexical matching.
-    """
-
     query_tokens = tokenize(query)
-
     scores = bm25.get_scores(query_tokens)
 
     ranked_indices = sorted(
@@ -56,14 +61,12 @@ def bm25_retrieve(
     results = []
 
     for index in ranked_indices:
+        result = chunks[index].copy()
 
-        chunk = chunks[index]
-
-        result = chunk.copy()
-
-        result["score"] = float(
-            scores[index]
+        result["chunk_key"] = (
+            f"{result['paper_id']}:{result['chunk_id']}"
         )
+        result["score"] = float(scores[index])
 
         results.append(result)
 
@@ -71,41 +74,21 @@ def bm25_retrieve(
 
 
 if __name__ == "__main__":
+    print("Loading research corpus...")
+    chunks = load_corpus_chunks()
 
-    from ingestion import (
-        ingest_pdf,
-        build_sections,
-        build_chunks,
-    )
-
-    pdf_path = "data/paper_1.pdf"
-
-    print("Loading paper...")
-
-    elements = ingest_pdf(pdf_path)
-
-    enriched_elements = build_sections(
-        elements
-    )
-
-    chunks = build_chunks(
-        enriched_elements,
-        max_chunk_tokens=400,
-    )
-
+    print(f"Total chunks: {len(chunks)}")
     print(
-        f"Built {len(chunks)} chunks."
+        f"Total papers: "
+        f"{len(set(chunk['paper_id'] for chunk in chunks))}"
     )
 
-    print(
-        "Building BM25 index..."
-    )
-
+    print("Building BM25 index...")
     bm25 = build_bm25_index(chunks)
 
     query = (
-        "Which machine learning model performed "
-        "best for predicting vehicle CO2 emissions?"
+        "Which machine learning model performed best "
+        "for predicting vehicle CO2 emissions?"
     )
 
     results = bm25_retrieve(
@@ -115,49 +98,18 @@ if __name__ == "__main__":
         top_k=5,
     )
 
-    print(
-        f"\nQuery:\n{query}\n"
-    )
+    print(f"\nQuery: {query}")
 
-    print(
-        f"Retrieved {len(results)} chunks."
-    )
-
-    for rank, result in enumerate(
-        results,
-        start=1,
-    ):
-
+    for rank, result in enumerate(results, start=1):
+        print(f"\n{'=' * 70}")
+        print(f"Rank: {rank}")
+        print(f"Paper: {result['paper_title']}")
+        print(f"Paper ID: {result['paper_id']}")
+        print(f"Chunk: {result['chunk_id']}")
+        print(f"BM25 score: {result['score']:.4f}")
+        print(f"Section: {result.get('section')}")
         print(
-            f"\n{'=' * 70}"
+            f"Pages: {result.get('page_start')}–"
+            f"{result.get('page_end')}"
         )
-
-        print(
-            f"RESULT {rank}"
-        )
-
-        print(
-            f"BM25 score: "
-            f"{result['score']:.4f}"
-        )
-
-        print(
-            f"Section: "
-            f"{result['section']}"
-        )
-
-        print(
-            f"Subsection: "
-            f"{result['subsection']}"
-        )
-
-        print(
-            f"Pages: "
-            f"{result['page_start']} - "
-            f"{result['page_end']}"
-        )
-
-        print(
-            f"\n{result['text']}"
-        )
-        
+        print(result["text"])

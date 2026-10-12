@@ -16,6 +16,7 @@ data/qdrant/
 huggingface/
 # Research papers
 data/*.pdf
+data/papers/*.pdf
 
 # Local vector database
 data/qdrant/

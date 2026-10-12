@@ -1,29 +1,31 @@
+
 from embeddings import load_model
 from retrieval import create_client, retrieve
-from bm25 import build_bm25_index, bm25_retrieve
+from bm25 import (
+    build_bm25_index,
+    bm25_retrieve,
+    load_corpus_chunks,
+)
 from hybrid import reciprocal_rank_fusion
 from reranker import load_reranker, rerank
-from ingestion import ingest_pdf, build_sections, build_chunks
-
-
-PDF_PATH = "data/paper_1.pdf"
 
 
 def build_retrievers():
-    elements = ingest_pdf(PDF_PATH)
+    print("Loading research corpus...")
+    chunks = load_corpus_chunks()
 
-    enriched_elements = build_sections(elements)
+    paper_ids = {
+        chunk["paper_id"]
+        for chunk in chunks
+    }
 
-    chunks = build_chunks(
-        enriched_elements,
-        max_chunk_tokens=400,
-    )
+    print(f"Total papers: {len(paper_ids)}")
+    print(f"Total chunks: {len(chunks)}")
 
     model = load_model()
     client = create_client()
 
     bm25 = build_bm25_index(chunks)
-
     reranker = load_reranker()
 
     return model, client, bm25, chunks, reranker
@@ -81,30 +83,34 @@ if __name__ == "__main__":
         "best for predicting vehicle CO2 emissions?"
     )
 
-    results = hybrid_retrieve(
-        query,
-        model,
-        client,
-        bm25,
-        chunks,
-        reranker,
-        top_k=5,
-    )
-
-    print("\n========== HYBRID + RERANKER ==========")
-
-    for rank, result in enumerate(
-        results,
-        start=1,
-    ):
-        print(
-            f"\nRank {rank}"
-            f"\nChunk: {result['chunk_id']}"
-            f"\nRRF Score: {result['rrf_score']:.4f}"
-            f"\nRerank Score: {result['rerank_score']:.4f}"
-            f"\nSection: {result['section']}"
-            f"\nPages: {result['page_start']}-{result['page_end']}"
-            f"\nText: {result['text'][:300]}..."
+    try:
+        results = hybrid_retrieve(
+            query,
+            model,
+            client,
+            bm25,
+            chunks,
+            reranker,
+            top_k=5,
         )
 
-    client.close()
+        print("\n========== MULTI-PAPER HYBRID + RERANKER ==========")
+
+        for rank, result in enumerate(results, start=1):
+            print(f"\n{'=' * 70}")
+            print(f"Rank: {rank}")
+            print(f"Paper: {result.get('paper_title', 'Unknown paper')}")
+            print(f"Paper ID: {result.get('paper_id', 'unknown')}")
+            print(f"Chunk: {result['chunk_id']}")
+            print(f"Chunk key: {result.get('chunk_key', 'unknown')}")
+            print(f"RRF score: {result['rrf_score']:.4f}")
+            print(f"Rerank score: {result['rerank_score']:.4f}")
+            print(f"Section: {result.get('section')}")
+            print(
+                f"Pages: {result.get('page_start')}–"
+                f"{result.get('page_end')}"
+            )
+            print(f"\n{result['text'][:700]}")
+
+    finally:
+        client.close()
