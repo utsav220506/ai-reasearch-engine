@@ -11,10 +11,15 @@ def reciprocal_rank_fusion(
 
     for ranked_results in ranked_lists:
         for rank, result in enumerate(ranked_results, start=1):
-            chunk_key = result.get(
-                "chunk_key",
-                f"{result.get('paper_id', 'unknown')}:{result['chunk_id']}",
-            )
+            chunk_key = result.get("chunk_key")
+            if not chunk_key:
+                paper_id = result.get("paper_id", "unknown")
+                chunk_id = result.get("chunk_id")
+                if chunk_id is not None:
+                    chunk_key = f"{paper_id}:{chunk_id}"
+                else:
+                    text = result.get("text", "")
+                    chunk_key = f"{paper_id}:{text}"
 
             fused_scores[chunk_key] = (
                 fused_scores.get(chunk_key, 0.0)

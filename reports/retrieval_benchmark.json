@@ -1,0 +1,677 @@
+{
+  "evaluation_questions": 11,
+  "evaluation_pdfs": 2,
+  "evaluation_chunks": 78,
+  "k": 5,
+  "candidate_k": 10,
+  "results": {
+    "dense": {
+      "summary": {
+        "hit_at_5": 0.9090909090909091,
+        "recall_at_5": 0.6357142857142857,
+        "reciprocal_rank": 0.6666666666666666,
+        "ndcg_at_5": 0.5501967761138655,
+        "average_latency_ms": 16.673613635992464,
+        "median_latency_ms": 14.710542047396302,
+        "query_count": 11
+      },
+      "per_question": [
+        {
+          "hit_at_5": 0,
+          "recall_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "ndcg_at_5": 0.0,
+          "first_relevant_rank": null,
+          "question": "Which machine learning algorithm achieved the highest classification accuracy?",
+          "latency_ms": 13.71,
+          "relevant_chunks": [
+            "paper-1:24"
+          ]
+        },
+        {
+          "hit_at_5": 1,
+          "recall_at_5": 1.0,
+          "reciprocal_rank": 0.5,
+          "ndcg_at_5": 0.6240505200038379,
+          "first_relevant_rank": 2,
+          "question": "Which machine learning algorithms were compared in the study?",
+          "latency_ms": 13.25,
+          "relevant_chunks": [
+            "paper-1:16",
+            "paper-1:24"
+          ]
+        },
+        {
+          "hit_at_5": 1,
+          "recall_at_5": 1.0,
+          "reciprocal_rank": 0.5,
+          "ndcg_at_5": 0.6309297535714575,
+          "first_relevant_rank": 2,
+          "question": "How does vehicle size affect CO2 emissions?",
+          "latency_ms": 12.82,
+          "relevant_chunks": [
+            "paper-1:20"
+          ]
+        },
+        {
+          "hit_at_5": 1,
+          "recall_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 0.9197207891481876,
+          "first_relevant_rank": 1,
+          "question": "How do SUVs compare with non-SUV vehicles in terms of CO2 emissions?",
+          "latency_ms": 15.1,
+          "relevant_chunks": [
+            "paper-1:20",
+            "paper-1:21"
+          ]
+        },
+        {
+          "hit_at_5": 1,
+          "recall_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 0.8529278650606567,
+          "first_relevant_rank": 1,
+          "question": "What machine learning methods were used to predict engine performance?",
+          "latency_ms": 14.37,
+          "relevant_chunks": [
+            "paper-1:5",
+            "paper-1:16",
+            "paper-1:24"
+          ]
+        },
+        {
+          "hit_at_5": 1,
+          "recall_at_5": 0.25,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 0.3903800499921017,
+          "first_relevant_rank": 1,
+          "question": "What are the three layers of the proposed Internet-of-Vehicles network?",
+          "latency_ms": 20.14,
+          "relevant_chunks": [
+            "paper-2:10",
+            "paper-2:11",
+            "paper-2:13",
+            "paper-2:14"
+          ]
+        },
+        {
+          "hit_at_5": 1,
+          "recall_at_5": 0.6,
+          "reciprocal_rank": 0.5,
+          "ndcg_at_5": 0.5296347172140421,
+          "first_relevant_rank": 2,
+          "question": "How does the on-board device obtain vehicle sensor data and transmit emissions information?",
+          "latency_ms": 23.26,
+          "relevant_chunks": [
+            "paper-2:9",
+            "paper-2:11",
+            "paper-2:12",
+            "paper-2:20",
+            "paper-2:21"
+          ]
+        },
+        {
+          "hit_at_5": 1,
+          "recall_at_5": 0.6666666666666666,
+          "reciprocal_rank": 0.5,
+          "ndcg_at_5": 0.5307212739772434,
+          "first_relevant_rank": 2,
+          "question": "How does the reinforcement learning agent use emissions to make traffic-management decisions?",
+          "latency_ms": 23.2,
+          "relevant_chunks": [
+            "paper-2:15",
+            "paper-2:16",
+            "paper-2:17"
+          ]
+        },
+        {
+          "hit_at_5": 1,
+          "recall_at_5": 0.3333333333333333,
+          "reciprocal_rank": 0.3333333333333333,
+          "ndcg_at_5": 0.23463936301137822,
+          "first_relevant_rank": 3,
+          "question": "What CO2 emission reductions did the reinforcement learning approach achieve?",
+          "latency_ms": 13.97,
+          "relevant_chunks": [
+            "paper-2:1",
+            "paper-2:24",
+            "paper-2:29"
+          ]
+        },
+        {
+          "hit_at_5": 1,
+          "recall_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "first_relevant_rank": 1,
+          "question": "How did the emission-reduction results differ between high-traffic and free-flow conditions?",
+          "latency_ms": 18.86,
+          "relevant_chunks": [
+            "paper-2:23",
+            "paper-2:24"
+          ]
+        },
+        {
+          "hit_at_5": 1,
+          "recall_at_5": 0.14285714285714285,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 0.3391602052736161,
+          "first_relevant_rank": 1,
+          "question": "How do the two papers approach reducing vehicle CO2 emissions differently?",
+          "latency_ms": 14.71,
+          "relevant_chunks": [
+            "paper-1:5",
+            "paper-1:20",
+            "paper-1:24",
+            "paper-2:8",
+            "paper-2:9",
+            "paper-2:24",
+            "paper-2:29"
+          ]
+        }
+      ]
+    },
+    "bm25": {
+      "summary": {
+        "hit_at_5": 1.0,
+        "recall_at_5": 0.6357142857142857,
+        "reciprocal_rank": 0.7757575757575758,
+        "ndcg_at_5": 0.5996080052719129,
+        "average_latency_ms": 0.12438637416132471,
+        "median_latency_ms": 0.11775002349168062,
+        "query_count": 11
+      },
+      "per_question": [
+        {
+          "hit_at_5": 1,
+          "recall_at_5": 1.0,
+          "reciprocal_rank": 0.5,
+          "ndcg_at_5": 0.6309297535714575,
+          "first_relevant_rank": 2,
+          "question": "Which machine learning algorithm achieved the highest classification accuracy?",
+          "latency_ms": 0.08,
+          "relevant_chunks": [
+            "paper-1:24"
+          ]
+        },
+        {
+          "hit_at_5": 1,
+          "recall_at_5": 0.5,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 0.6131471927654584,
+          "first_relevant_rank": 1,
+          "question": "Which machine learning algorithms were compared in the study?",
+          "latency_ms": 0.12,
+          "relevant_chunks": [
+            "paper-1:16",
+            "paper-1:24"
+          ]
+        },
+        {
+          "hit_at_5": 1,
+          "recall_at_5": 1.0,
+          "reciprocal_rank": 0.3333333333333333,
+          "ndcg_at_5": 0.5,
+          "first_relevant_rank": 3,
+          "question": "How does vehicle size affect CO2 emissions?",
+          "latency_ms": 0.13,
+          "relevant_chunks": [
+            "paper-1:20"
+          ]
+        },
+        {
+          "hit_at_5": 1,
+          "recall_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "first_relevant_rank": 1,
+          "question": "How do SUVs compare with non-SUV vehicles in terms of CO2 emissions?",
+          "latency_ms": 0.13,
+          "relevant_chunks": [
+            "paper-1:20",
+            "paper-1:21"
+          ]
+        },
+        {
+          "hit_at_5": 1,
+          "recall_at_5": 0.6666666666666666,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 0.7653606369886217,
+          "first_relevant_rank": 1,
+          "question": "What machine learning methods were used to predict engine performance?",
+          "latency_ms": 0.12,
+          "relevant_chunks": [
+            "paper-1:5",
+            "paper-1:16",
+            "paper-1:24"
+          ]
+        },
+        {
+          "hit_at_5": 1,
+          "recall_at_5": 0.25,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 0.3903800499921017,
+          "first_relevant_rank": 1,
+          "question": "What are the three layers of the proposed Internet-of-Vehicles network?",
+          "latency_ms": 0.15,
+          "relevant_chunks": [
+            "paper-2:10",
+            "paper-2:11",
+            "paper-2:13",
+            "paper-2:14"
+          ]
+        },
+        {
+          "hit_at_5": 1,
+          "recall_at_5": 0.6,
+          "reciprocal_rank": 0.5,
+          "ndcg_at_5": 0.5147714448836774,
+          "first_relevant_rank": 2,
+          "question": "How does the on-board device obtain vehicle sensor data and transmit emissions information?",
+          "latency_ms": 0.14,
+          "relevant_chunks": [
+            "paper-2:9",
+            "paper-2:11",
+            "paper-2:12",
+            "paper-2:20",
+            "paper-2:21"
+          ]
+        },
+        {
+          "hit_at_5": 1,
+          "recall_at_5": 0.6666666666666666,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 0.7653606369886217,
+          "first_relevant_rank": 1,
+          "question": "How does the reinforcement learning agent use emissions to make traffic-management decisions?",
+          "latency_ms": 0.11,
+          "relevant_chunks": [
+            "paper-2:15",
+            "paper-2:16",
+            "paper-2:17"
+          ]
+        },
+        {
+          "hit_at_5": 1,
+          "recall_at_5": 0.6666666666666666,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 0.6713860725233041,
+          "first_relevant_rank": 1,
+          "question": "What CO2 emission reductions did the reinforcement learning approach achieve?",
+          "latency_ms": 0.1,
+          "relevant_chunks": [
+            "paper-2:1",
+            "paper-2:24",
+            "paper-2:29"
+          ]
+        },
+        {
+          "hit_at_5": 1,
+          "recall_at_5": 0.5,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 0.6131471927654584,
+          "first_relevant_rank": 1,
+          "question": "How did the emission-reduction results differ between high-traffic and free-flow conditions?",
+          "latency_ms": 0.12,
+          "relevant_chunks": [
+            "paper-2:23",
+            "paper-2:24"
+          ]
+        },
+        {
+          "hit_at_5": 1,
+          "recall_at_5": 0.14285714285714285,
+          "reciprocal_rank": 0.2,
+          "ndcg_at_5": 0.13120507751234178,
+          "first_relevant_rank": 5,
+          "question": "How do the two papers approach reducing vehicle CO2 emissions differently?",
+          "latency_ms": 0.17,
+          "relevant_chunks": [
+            "paper-1:5",
+            "paper-1:20",
+            "paper-1:24",
+            "paper-2:8",
+            "paper-2:9",
+            "paper-2:24",
+            "paper-2:29"
+          ]
+        }
+      ]
+    },
+    "hybrid_rrf": {
+      "summary": {
+        "hit_at_5": 1.0,
+        "recall_at_5": 0.6963203463203463,
+        "reciprocal_rank": 0.8863636363636364,
+        "ndcg_at_5": 0.6963791291576509,
+        "average_latency_ms": 18.80494716831229,
+        "median_latency_ms": 18.76720890868455,
+        "query_count": 11
+      },
+      "per_question": [
+        {
+          "hit_at_5": 1,
+          "recall_at_5": 1.0,
+          "reciprocal_rank": 0.5,
+          "ndcg_at_5": 0.6309297535714575,
+          "first_relevant_rank": 2,
+          "question": "Which machine learning algorithm achieved the highest classification accuracy?",
+          "latency_ms": 14.75,
+          "relevant_chunks": [
+            "paper-1:24"
+          ]
+        },
+        {
+          "hit_at_5": 1,
+          "recall_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 0.9197207891481876,
+          "first_relevant_rank": 1,
+          "question": "Which machine learning algorithms were compared in the study?",
+          "latency_ms": 14.71,
+          "relevant_chunks": [
+            "paper-1:16",
+            "paper-1:24"
+          ]
+        },
+        {
+          "hit_at_5": 1,
+          "recall_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "first_relevant_rank": 1,
+          "question": "How does vehicle size affect CO2 emissions?",
+          "latency_ms": 15.0,
+          "relevant_chunks": [
+            "paper-1:20"
+          ]
+        },
+        {
+          "hit_at_5": 1,
+          "recall_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 1.0,
+          "first_relevant_rank": 1,
+          "question": "How do SUVs compare with non-SUV vehicles in terms of CO2 emissions?",
+          "latency_ms": 20.8,
+          "relevant_chunks": [
+            "paper-1:20",
+            "paper-1:21"
+          ]
+        },
+        {
+          "hit_at_5": 1,
+          "recall_at_5": 0.6666666666666666,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 0.7653606369886217,
+          "first_relevant_rank": 1,
+          "question": "What machine learning methods were used to predict engine performance?",
+          "latency_ms": 15.01,
+          "relevant_chunks": [
+            "paper-1:5",
+            "paper-1:16",
+            "paper-1:24"
+          ]
+        },
+        {
+          "hit_at_5": 1,
+          "recall_at_5": 0.25,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 0.3903800499921017,
+          "first_relevant_rank": 1,
+          "question": "What are the three layers of the proposed Internet-of-Vehicles network?",
+          "latency_ms": 21.32,
+          "relevant_chunks": [
+            "paper-2:10",
+            "paper-2:11",
+            "paper-2:13",
+            "paper-2:14"
+          ]
+        },
+        {
+          "hit_at_5": 1,
+          "recall_at_5": 0.6,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 0.7227265726449519,
+          "first_relevant_rank": 1,
+          "question": "How does the on-board device obtain vehicle sensor data and transmit emissions information?",
+          "latency_ms": 22.35,
+          "relevant_chunks": [
+            "paper-2:9",
+            "paper-2:11",
+            "paper-2:12",
+            "paper-2:20",
+            "paper-2:21"
+          ]
+        },
+        {
+          "hit_at_5": 1,
+          "recall_at_5": 0.6666666666666666,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 0.7653606369886217,
+          "first_relevant_rank": 1,
+          "question": "How does the reinforcement learning agent use emissions to make traffic-management decisions?",
+          "latency_ms": 23.25,
+          "relevant_chunks": [
+            "paper-2:15",
+            "paper-2:16",
+            "paper-2:17"
+          ]
+        },
+        {
+          "hit_at_5": 1,
+          "recall_at_5": 0.3333333333333333,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 0.46927872602275644,
+          "first_relevant_rank": 1,
+          "question": "What CO2 emission reductions did the reinforcement learning approach achieve?",
+          "latency_ms": 18.77,
+          "relevant_chunks": [
+            "paper-2:1",
+            "paper-2:24",
+            "paper-2:29"
+          ]
+        },
+        {
+          "hit_at_5": 1,
+          "recall_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 0.8503449055347546,
+          "first_relevant_rank": 1,
+          "question": "How did the emission-reduction results differ between high-traffic and free-flow conditions?",
+          "latency_ms": 26.78,
+          "relevant_chunks": [
+            "paper-2:23",
+            "paper-2:24"
+          ]
+        },
+        {
+          "hit_at_5": 1,
+          "recall_at_5": 0.14285714285714285,
+          "reciprocal_rank": 0.25,
+          "ndcg_at_5": 0.14606834984270645,
+          "first_relevant_rank": 4,
+          "question": "How do the two papers approach reducing vehicle CO2 emissions differently?",
+          "latency_ms": 14.12,
+          "relevant_chunks": [
+            "paper-1:5",
+            "paper-1:20",
+            "paper-1:24",
+            "paper-2:8",
+            "paper-2:9",
+            "paper-2:24",
+            "paper-2:29"
+          ]
+        }
+      ]
+    },
+    "hybrid_rrf_reranker": {
+      "summary": {
+        "hit_at_5": 1.0,
+        "recall_at_5": 0.6508658008658009,
+        "reciprocal_rank": 0.6060606060606061,
+        "ndcg_at_5": 0.5276532599126198,
+        "average_latency_ms": 467.1891819135371,
+        "median_latency_ms": 468.3724580099806,
+        "query_count": 11
+      },
+      "per_question": [
+        {
+          "hit_at_5": 1,
+          "recall_at_5": 1.0,
+          "reciprocal_rank": 0.5,
+          "ndcg_at_5": 0.6309297535714575,
+          "first_relevant_rank": 2,
+          "question": "Which machine learning algorithm achieved the highest classification accuracy?",
+          "latency_ms": 468.37,
+          "relevant_chunks": [
+            "paper-1:24"
+          ]
+        },
+        {
+          "hit_at_5": 1,
+          "recall_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 0.9197207891481876,
+          "first_relevant_rank": 1,
+          "question": "Which machine learning algorithms were compared in the study?",
+          "latency_ms": 473.8,
+          "relevant_chunks": [
+            "paper-1:16",
+            "paper-1:24"
+          ]
+        },
+        {
+          "hit_at_5": 1,
+          "recall_at_5": 1.0,
+          "reciprocal_rank": 0.5,
+          "ndcg_at_5": 0.6309297535714575,
+          "first_relevant_rank": 2,
+          "question": "How does vehicle size affect CO2 emissions?",
+          "latency_ms": 464.5,
+          "relevant_chunks": [
+            "paper-1:20"
+          ]
+        },
+        {
+          "hit_at_5": 1,
+          "recall_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 0.9197207891481876,
+          "first_relevant_rank": 1,
+          "question": "How do SUVs compare with non-SUV vehicles in terms of CO2 emissions?",
+          "latency_ms": 477.61,
+          "relevant_chunks": [
+            "paper-1:20",
+            "paper-1:21"
+          ]
+        },
+        {
+          "hit_at_5": 1,
+          "recall_at_5": 0.6666666666666666,
+          "reciprocal_rank": 0.5,
+          "ndcg_at_5": 0.49818925746641285,
+          "first_relevant_rank": 2,
+          "question": "What machine learning methods were used to predict engine performance?",
+          "latency_ms": 469.98,
+          "relevant_chunks": [
+            "paper-1:5",
+            "paper-1:16",
+            "paper-1:24"
+          ]
+        },
+        {
+          "hit_at_5": 1,
+          "recall_at_5": 0.25,
+          "reciprocal_rank": 0.5,
+          "ndcg_at_5": 0.24630238874073,
+          "first_relevant_rank": 2,
+          "question": "What are the three layers of the proposed Internet-of-Vehicles network?",
+          "latency_ms": 475.44,
+          "relevant_chunks": [
+            "paper-2:10",
+            "paper-2:11",
+            "paper-2:13",
+            "paper-2:14"
+          ]
+        },
+        {
+          "hit_at_5": 1,
+          "recall_at_5": 0.6,
+          "reciprocal_rank": 0.5,
+          "ndcg_at_5": 0.5147714448836774,
+          "first_relevant_rank": 2,
+          "question": "How does the on-board device obtain vehicle sensor data and transmit emissions information?",
+          "latency_ms": 460.37,
+          "relevant_chunks": [
+            "paper-2:9",
+            "paper-2:11",
+            "paper-2:12",
+            "paper-2:20",
+            "paper-2:21"
+          ]
+        },
+        {
+          "hit_at_5": 1,
+          "recall_at_5": 0.3333333333333333,
+          "reciprocal_rank": 0.5,
+          "ndcg_at_5": 0.2960819109658652,
+          "first_relevant_rank": 2,
+          "question": "How does the reinforcement learning agent use emissions to make traffic-management decisions?",
+          "latency_ms": 441.54,
+          "relevant_chunks": [
+            "paper-2:15",
+            "paper-2:16",
+            "paper-2:17"
+          ]
+        },
+        {
+          "hit_at_5": 1,
+          "recall_at_5": 0.6666666666666666,
+          "reciprocal_rank": 1.0,
+          "ndcg_at_5": 0.6713860725233041,
+          "first_relevant_rank": 1,
+          "question": "What CO2 emission reductions did the reinforcement learning approach achieve?",
+          "latency_ms": 460.94,
+          "relevant_chunks": [
+            "paper-2:1",
+            "paper-2:24",
+            "paper-2:29"
+          ]
+        },
+        {
+          "hit_at_5": 1,
+          "recall_at_5": 0.5,
+          "reciprocal_rank": 0.3333333333333333,
+          "ndcg_at_5": 0.3065735963827292,
+          "first_relevant_rank": 3,
+          "question": "How did the emission-reduction results differ between high-traffic and free-flow conditions?",
+          "latency_ms": 478.63,
+          "relevant_chunks": [
+            "paper-2:23",
+            "paper-2:24"
+          ]
+        },
+        {
+          "hit_at_5": 1,
+          "recall_at_5": 0.14285714285714285,
+          "reciprocal_rank": 0.3333333333333333,
+          "ndcg_at_5": 0.16958010263680806,
+          "first_relevant_rank": 3,
+          "question": "How do the two papers approach reducing vehicle CO2 emissions differently?",
+          "latency_ms": 467.91,
+          "relevant_chunks": [
+            "paper-1:5",
+            "paper-1:20",
+            "paper-1:24",
+            "paper-2:8",
+            "paper-2:9",
+            "paper-2:24",
+            "paper-2:29"
+          ]
+        }
+      ]
+    }
+  }
+}

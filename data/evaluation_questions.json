@@ -1,22 +1,47 @@
+
 [
   {
     "question": "Which machine learning algorithm achieved the highest classification accuracy?",
-    "relevant_chunks": [24]
+    "relevant_chunks": ["paper-1:24"]
   },
   {
     "question": "Which machine learning algorithms were compared in the study?",
-    "relevant_chunks": [16, 24]
+    "relevant_chunks": ["paper-1:16", "paper-1:24"]
   },
   {
     "question": "How does vehicle size affect CO2 emissions?",
-    "relevant_chunks": [20]
+    "relevant_chunks": ["paper-1:20"]
   },
   {
     "question": "How do SUVs compare with non-SUV vehicles in terms of CO2 emissions?",
-    "relevant_chunks": [20, 21]
+    "relevant_chunks": ["paper-1:20", "paper-1:21"]
   },
   {
     "question": "What machine learning methods were used to predict engine performance?",
-    "relevant_chunks": [5]
+    "relevant_chunks": ["paper-1:5", "paper-1:16", "paper-1:24"]
+  },
+  {
+    "question": "What are the three layers of the proposed Internet-of-Vehicles network?",
+    "relevant_chunks": ["paper-2:10", "paper-2:11", "paper-2:13", "paper-2:14"]
+  },
+  {
+    "question": "How does the on-board device obtain vehicle sensor data and transmit emissions information?",
+    "relevant_chunks": ["paper-2:9", "paper-2:11", "paper-2:12", "paper-2:20", "paper-2:21"]
+  },
+  {
+    "question": "How does the reinforcement learning agent use emissions to make traffic-management decisions?",
+    "relevant_chunks": ["paper-2:15", "paper-2:16", "paper-2:17"]
+  },
+  {
+    "question": "What CO2 emission reductions did the reinforcement learning approach achieve?",
+    "relevant_chunks": ["paper-2:1", "paper-2:24", "paper-2:29"]
+  },
+  {
+    "question": "How did the emission-reduction results differ between high-traffic and free-flow conditions?",
+    "relevant_chunks": ["paper-2:23", "paper-2:24"]
+  },
+  {
+    "question": "How do the two papers approach reducing vehicle CO2 emissions differently?",
+    "relevant_chunks": ["paper-1:5", "paper-1:20", "paper-1:24", "paper-2:8", "paper-2:9", "paper-2:24", "paper-2:29"]
   }
 ]

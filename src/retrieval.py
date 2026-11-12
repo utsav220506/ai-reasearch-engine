@@ -1,7 +1,7 @@
-
 from typing import Any
 
 from qdrant_client import QdrantClient
+from qdrant_client.models import Filter, FieldCondition, MatchValue
 
 from embeddings import load_model, embed_text
 from vector_store import COLLECTION_NAME, DB_PATH
@@ -16,12 +16,26 @@ def retrieve(
     model,
     query: str,
     top_k: int = 5,
+    paper_id: str | None = None,
 ) -> list[dict[str, Any]]:
     query_embedding = embed_text(model, query)
+
+    query_filter = None
+
+    if paper_id:
+        query_filter = Filter(
+            must=[
+                FieldCondition(
+                    key="paper_id",
+                    match=MatchValue(value=paper_id),
+                )
+            ]
+        )
 
     results = client.query_points(
         collection_name=COLLECTION_NAME,
         query=query_embedding,
+        query_filter=query_filter,
         limit=top_k,
         with_payload=True,
     ).points
@@ -31,26 +45,24 @@ def retrieve(
     for result in results:
         payload = result.payload or {}
 
-        paper_id = payload.get("paper_id", "unknown")
+        paper_id_value = payload.get("paper_id", "unknown")
         local_chunk_id = payload.get("chunk_id", result.id)
 
-        retrieved_chunks.append(
-            {
-                "point_id": result.id,
-                "chunk_id": local_chunk_id,
-                "chunk_key": f"{paper_id}:{local_chunk_id}",
-                "paper_id": paper_id,
-                "paper_title": payload.get("paper_title", "Unknown paper"),
-                "source_file": payload.get("source_file"),
-                "score": result.score,
-                "text": payload["text"],
-                "section": payload.get("section"),
-                "subsection": payload.get("subsection"),
-                "page_start": payload.get("page_start"),
-                "page_end": payload.get("page_end"),
-                "token_count": payload.get("token_count"),
-            }
-        )
+        retrieved_chunks.append({
+            "point_id": result.id,
+            "chunk_id": local_chunk_id,
+            "chunk_key": f"{paper_id_value}:{local_chunk_id}",
+            "paper_id": paper_id_value,
+            "paper_title": payload.get("paper_title", "Unknown paper"),
+            "source_file": payload.get("source_file"),
+            "score": result.score,
+            "text": payload["text"],
+            "section": payload.get("section"),
+            "subsection": payload.get("subsection"),
+            "page_start": payload.get("page_start"),
+            "page_end": payload.get("page_end"),
+            "token_count": payload.get("token_count"),
+        })
 
     return retrieved_chunks
 

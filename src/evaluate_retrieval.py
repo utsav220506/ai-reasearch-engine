@@ -1,289 +1,280 @@
+
 import json
-from reranker import load_reranker, rerank
+import time
+from pathlib import Path
+import statistics
 
 from embeddings import load_model
 from retrieval import create_client, retrieve
-
 from bm25 import build_bm25_index, bm25_retrieve
 from hybrid import reciprocal_rank_fusion
+from reranker import load_reranker, rerank
+from index_corpus import build_paper_chunks
 
-from ingestion import ingest_pdf, build_sections, build_chunks
 
-
-EVALUATION_FILE = "data/evaluation_questions.json"
-PDF_PATH = "data/paper_1.pdf"
+EVALUATION_FILE = Path("data/evaluation_questions.json")
+PAPERS_DIR = Path("data/papers")
+REPORT_FILE = Path("reports/retrieval_benchmark.json")
+K = 5
+CANDIDATE_K = 10
 
 
 def load_questions():
-    with open(EVALUATION_FILE, "r") as file:
-        return json.load(file)
+    with EVALUATION_FILE.open("r") as file:
+        questions = json.load(file)
+
+    if not questions:
+        raise ValueError("Evaluation dataset is empty.")
+
+    for index, item in enumerate(questions, start=1):
+        if not item.get("question") or not item.get("relevant_chunks"):
+            raise ValueError(
+                f"Question {index} must contain a question and relevant_chunks."
+            )
+
+    return questions
 
 
-def find_relevant_rank(results, relevant_chunks):
-    for rank, result in enumerate(results, start=1):
-        if result["chunk_id"] in relevant_chunks:
-            return rank
-    return None
+def result_key(result):
+    if result.get("chunk_key"):
+        return str(result["chunk_key"])
+
+    paper_id = result.get("paper_id")
+    chunk_id = result.get("chunk_id")
+
+    if paper_id is not None and chunk_id is not None:
+        return f"{paper_id}:{chunk_id}"
+
+    raise ValueError(f"Retrieved result lacks chunk identity: {result}")
 
 
-def recall_at_k(results, relevant_chunks, k):
-    rank = find_relevant_rank(results, relevant_chunks)
-    if rank is not None and rank <= k:
-        return 1
-    return 0
+def calculate_metrics(results, relevant_chunks, k=K):
+    relevant = {str(chunk) for chunk in relevant_chunks}
 
+    if not relevant:
+        raise ValueError("Relevant chunk labels cannot be empty.")
 
-def reciprocal_rank(results, relevant_chunks):
-    rank = find_relevant_rank(results, relevant_chunks)
-    if rank is None:
-        return 0.0
-    return 1 / rank
+    ranked_keys = [result_key(result) for result in results]
+    top_keys = ranked_keys[:k]
+
+    retrieved_relevant = relevant.intersection(top_keys)
+    hit = int(bool(retrieved_relevant))
+    recall = len(retrieved_relevant) / len(relevant)
+
+    first_relevant_rank = next(
+        (
+            rank
+            for rank, key in enumerate(ranked_keys, start=1)
+            if key in relevant
+        ),
+        None,
+    )
+
+    reciprocal_rank = (
+        1 / first_relevant_rank if first_relevant_rank else 0.0
+    )
+
+    dcg = sum(
+        1 / __import__("math").log2(rank + 1)
+        for rank, key in enumerate(top_keys, start=1)
+        if key in relevant
+    )
+
+    ideal_relevant_count = min(len(relevant), k)
+    idcg = sum(
+        1 / __import__("math").log2(rank + 1)
+        for rank in range(1, ideal_relevant_count + 1)
+    )
+
+    ndcg = dcg / idcg if idcg else 0.0
+
+    return {
+        "hit_at_5": hit,
+        "recall_at_5": recall,
+        "reciprocal_rank": reciprocal_rank,
+        "ndcg_at_5": ndcg,
+        "first_relevant_rank": first_relevant_rank,
+    }
+
 
 def evaluate(questions, retrieve_function, name):
-    recall_scores = []
-    reciprocal_ranks = []
+    per_question = []
+    latencies = []
 
     print(f"\n========== {name} ==========")
 
+    # Warm up the retrieval path before measuring latency.
+    retrieve_function(questions[0]["question"])
+
     for index, item in enumerate(questions, start=1):
-
+        start = time.perf_counter()
         results = retrieve_function(item["question"])
+        latency_ms = (time.perf_counter() - start) * 1000
 
-        relevant_chunks = item["relevant_chunks"]
-
-        rank = find_relevant_rank(
+        metrics = calculate_metrics(
             results,
-            relevant_chunks,
+            item["relevant_chunks"],
         )
 
-        recall = recall_at_k(
-            results,
-            relevant_chunks,
-            k=5,
-        )
+        metrics["question"] = item["question"]
+        metrics["latency_ms"] = round(latency_ms, 2)
+        metrics["relevant_chunks"] = item["relevant_chunks"]
 
-        rr = reciprocal_rank(
-            results,
-            relevant_chunks,
-        )
+        per_question.append(metrics)
+        latencies.append(latency_ms)
 
-        recall_scores.append(recall)
-        reciprocal_ranks.append(rr)
-
+        rank = metrics["first_relevant_rank"]
         rank_display = rank if rank is not None else "NOT FOUND"
 
         print(f"\nQ{index}: {item['question']}")
-        print(f"Relevant chunks: {relevant_chunks}")
         print(f"Relevant rank: {rank_display}")
-        print(f"Recall@5: {recall}")
-        print(f"Reciprocal Rank: {rr:.4f}")
+        print(f"Hit@5:         {metrics['hit_at_5']}")
+        print(f"Recall@5:      {metrics['recall_at_5']:.4f}")
+        print(f"MRR:           {metrics['reciprocal_rank']:.4f}")
+        print(f"nDCG@5:        {metrics['ndcg_at_5']:.4f}")
+        print(f"Latency:       {latency_ms:.2f} ms")
 
-        print("Top results:")
+    metric_names = [
+        "hit_at_5",
+        "recall_at_5",
+        "reciprocal_rank",
+        "ndcg_at_5",
+    ]
 
-        for result_rank, result in enumerate(results[:5], start=1):
-            print(
-                f"  {result_rank}. "
-                f"chunk={result['chunk_id']} "
-                f"section={result['section']}"
-            )
+    summary = {
+        metric: sum(row[metric] for row in per_question) / len(per_question)
+        for metric in metric_names
+    }
 
-    mean_recall = sum(recall_scores) / len(recall_scores)
-    mean_reciprocal_rank = (
-        sum(reciprocal_ranks) / len(reciprocal_ranks)
-    )
+    summary["average_latency_ms"] = sum(latencies) / len(latencies)
+    summary["median_latency_ms"] = statistics.median(latencies)
+    summary["query_count"] = len(questions)
 
-    print(f"\n{name} Summary:")
-    print(f"Recall@5: {mean_recall:.4f}")
-    print(f"MRR:      {mean_reciprocal_rank:.4f}")
+    print(f"\n{name} SUMMARY")
+    for metric, value in summary.items():
+        print(f"{metric:<24}: {value:.4f}" if isinstance(value, float)
+              else f"{metric:<24}: {value}")
 
-    return mean_recall, mean_reciprocal_rank
+    return {
+        "summary": summary,
+        "per_question": per_question,
+    }
 
 
 def main():
-
     questions = load_questions()
 
-    # -------------------------
-    # Build corpus
-    # -------------------------
+    pdf_files = sorted(PAPERS_DIR.glob("*.pdf"))
 
-    elements = ingest_pdf(PDF_PATH)
+    if not pdf_files:
+        raise FileNotFoundError(f"No PDFs found in {PAPERS_DIR.resolve()}")
 
-    enriched_elements = build_sections(elements)
+    chunks = []
 
-    chunks = build_chunks(
-        enriched_elements,
-        max_chunk_tokens=400,
-    )
+    for pdf_path in pdf_files:
+        chunks.extend(build_paper_chunks(pdf_path))
 
-    # -------------------------
-    # Initialize retrievers
-    # -------------------------
+    if not chunks:
+        raise RuntimeError("No chunks were extracted from the PDFs.")
+
+    print(f"Evaluation questions: {len(questions)}")
+    print(f"Evaluation PDFs:      {len(pdf_files)}")
+    print(f"Evaluation chunks:    {len(chunks)}")
 
     model = load_model()
-
     client = create_client()
-
     bm25 = build_bm25_index(chunks)
     reranker = load_reranker()
 
-    # -------------------------
-    # Dense retrieval
-    # -------------------------
-
     def dense_search(question):
-
-        return retrieve(
-            client,
-            model,
-            question,
-            top_k=5,
-        )
-
-    # -------------------------
-    # BM25 retrieval
-    # -------------------------
+        return retrieve(client, model, question, top_k=K)
 
     def bm25_search(question):
-
-        return bm25_retrieve(
-            bm25,
-            chunks,
-            question,
-            top_k=5,
-        )
-
-    # -------------------------
-    # Hybrid retrieval
-    # -------------------------
+        return bm25_retrieve(bm25, chunks, question, top_k=K)
 
     def hybrid_search(question):
-
-        candidate_k = 10
-
         dense_results = retrieve(
-            client,
-            model,
-            question,
-            top_k=candidate_k,
+            client, model, question, top_k=CANDIDATE_K
+        )
+        lexical_results = bm25_retrieve(
+            bm25, chunks, question, top_k=CANDIDATE_K
         )
 
-        bm25_results = bm25_retrieve(
-            bm25,
-            chunks,
-            question,
-            top_k=candidate_k,
+        fused = reciprocal_rank_fusion(
+            [dense_results, lexical_results]
         )
+        return fused[:K]
 
-        fused_results = reciprocal_rank_fusion(
-            [
-                dense_results,
-                bm25_results,
-            ]
-        )
-
-        return fused_results[:5]
-    def hybrid_reranked_search(question):
-        candidate_k = 10
-
+    def reranked_search(question):
         dense_results = retrieve(
-            client,
-            model,
-            question,
-            top_k=candidate_k,
+            client, model, question, top_k=CANDIDATE_K
+        )
+        lexical_results = bm25_retrieve(
+            bm25, chunks, question, top_k=CANDIDATE_K
         )
 
-        bm25_results = bm25_retrieve(
-            bm25,
-            chunks,
-            question,
-            top_k=candidate_k,
+        fused = reciprocal_rank_fusion(
+            [dense_results, lexical_results]
         )
-
-        fused_results = reciprocal_rank_fusion(
-            [
-                dense_results,
-                bm25_results,
-            ]
-        )
-
-        candidates = fused_results[:candidate_k]
 
         return rerank(
             reranker,
             question,
-            candidates,
-            top_k=5,
+            fused[:CANDIDATE_K],
+            top_k=K,
         )
 
-    # -------------------------
-    # Run evaluations
-    # -------------------------
+    retrievers = {
+        "dense": dense_search,
+        "bm25": bm25_search,
+        "hybrid_rrf": hybrid_search,
+        "hybrid_rrf_reranker": reranked_search,
+    }
 
-    dense_recall, dense_mrr = evaluate(
-        questions,
-        dense_search,
-        "DENSE RETRIEVAL",
-    )
+    report = {
+        "evaluation_questions": len(questions),
+        "evaluation_pdfs": len(pdf_files),
+        "evaluation_chunks": len(chunks),
+        "k": K,
+        "candidate_k": CANDIDATE_K,
+        "results": {},
+    }
 
-    bm25_recall, bm25_mrr = evaluate(
-        questions,
-        bm25_search,
-        "BM25 RETRIEVAL",
-    )
+    try:
+        for name, function in retrievers.items():
+            report["results"][name] = evaluate(
+                questions,
+                function,
+                name.upper(),
+            )
 
-    hybrid_recall, hybrid_mrr = evaluate(
-        questions,
-        hybrid_search,
-        "HYBRID RRF",
-    )
-    reranked_recall, reranked_mrr = evaluate(
-        questions,
-        hybrid_reranked_search,
-        "HYBRID RRF + RERANKER",
-    )
+        print("\n========== FINAL COMPARISON ==========")
+        print(
+            f"{'Retriever':<25}"
+            f"{'Recall@5':<12}"
+            f"{'MRR':<12}"
+            f"{'nDCG@5':<12}"
+            f"{'Latency ms':<12}"
+        )
 
+        for name, result in report["results"].items():
+            summary = result["summary"]
+            print(
+                f"{name:<25}"
+                f"{summary['recall_at_5']:<12.4f}"
+                f"{summary['reciprocal_rank']:<12.4f}"
+                f"{summary['ndcg_at_5']:<12.4f}"
+                f"{summary['average_latency_ms']:<12.2f}"
+            )
 
-    # -------------------------
-    # Final comparison
-    # -------------------------
+        REPORT_FILE.parent.mkdir(parents=True, exist_ok=True)
+        with REPORT_FILE.open("w") as file:
+            json.dump(report, file, indent=2)
 
-    print("\n========================================")
-    print("FINAL RETRIEVAL COMPARISON")
-    print("========================================")
+        print(f"\nBenchmark report saved to: {REPORT_FILE}")
 
-    print(
-        f"{'Retriever':<24}"
-        f"{'Recall@5':<12}"
-        f"{'MRR':<12}"
-    )
-    print("-" * 48)
-
-    print(
-        f"{'Dense':<24}"
-        f"{dense_recall:<12.4f}"
-        f"{dense_mrr:<12.4f}"
-    )
-
-    print(
-        f"{'BM25':<24}"
-        f"{bm25_recall:<12.4f}"
-        f"{bm25_mrr:<12.4f}"
-    )
-
-    print(
-        f"{'Hybrid RRF':<24}"
-        f"{hybrid_recall:<12.4f}"
-        f"{hybrid_mrr:<12.4f}"
-    )
-
-    print(
-        f"{'Hybrid RRF + Reranker':<24}"
-        f"{reranked_recall:<12.4f}"
-        f"{reranked_mrr:<12.4f}"
-    )
-
-    client.close()
+    finally:
+        client.close()
 
 
 if __name__ == "__main__":

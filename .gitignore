@@ -1,31 +1,53 @@
-# Python
 __pycache__/
 *.py[cod]
-.venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
 venv/
+.venv/
 env/
 
-# macOS
 .DS_Store
 
-# Local vector database
+# Local indexes, databases, and uploaded research papers
 data/qdrant/
+*.pdf
+*.sqlite
+*.sqlite3
+*.db
 
-# Model/cache files
+# Model and framework caches
 .cache/
 huggingface/
-# Research papers
-data/*.pdf
-data/papers/*.pdf
+**/models/
+**/model_cache/
+**/.cache/
+**/huggingface/
 
-# Local vector database
-data/qdrant/
+reports/chunk_catalog.txt
 
-# Python
-__pycache__/
-*.py[cod]
-venv/
-.venv/
+# Local credentials and secrets
+.env
+.env.*
+!.env.example
+.streamlit/secrets.toml
+secrets.toml
+*.pem
+*.key
+*.p12
+*.pfx
 
-# macOS
-.DS_Store
+# Logs and temporary/editor files
+*.log
+*.tmp
+*.temp
+*.swp
+*~
+tmp/
+temp/
+.temp/
+
+# Local coding-agent skill links
+.agents/
+.claude/
